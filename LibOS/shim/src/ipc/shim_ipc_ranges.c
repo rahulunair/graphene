@@ -614,20 +614,9 @@ int init_ns_ranges(void) {
 }
 
 static void ipc_leader_exit(struct shim_ipc_port* port, IDTYPE vmid) {
-    lock(&g_process_ipc_info.lock);
-
-    if (!g_process_ipc_info.ns || g_process_ipc_info.ns->port != port) {
-        unlock(&g_process_ipc_info.lock);
-        return;
-    }
-
-    struct shim_ipc_info* info = g_process_ipc_info.ns;
-    g_process_ipc_info.ns = NULL;
-    unlock(&g_process_ipc_info.lock);
-
     log_debug("ipc port %p of process %u closed suggests leader exits\n", port, vmid);
-
-    put_ipc_info(info);
+    log_error("IPC leader exited - this is not supported by Graphene and probably a bug\n");
+    DkProcessExit(1);
 }
 
 /*

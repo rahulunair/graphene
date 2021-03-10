@@ -182,14 +182,16 @@ struct shim_process_ipc_info* create_process_ipc_info(void) {
     if (!new_process_ipc_info->parent)
         goto fail;
 
-    /* new process inherits the same namespace leader */
-    if (g_process_ipc_info.ns) {
-        new_process_ipc_info->ns = create_ipc_info(g_process_ipc_info.ns->vmid,
-                                                   qstrgetstr(&g_process_ipc_info.ns->uri),
-                                                   g_process_ipc_info.ns->uri.len);
-        if (!new_process_ipc_info->ns)
-            goto fail;
+    if (!g_process_ipc_info.ns) {
+        // TODO assert
+        BUG();
     }
+    assert(!qstrempty(&g_process_ipc_info.ns->uri));
+    new_process_ipc_info->ns = create_ipc_info(g_process_ipc_info.ns->vmid,
+                                               qstrgetstr(&g_process_ipc_info.ns->uri),
+                                               g_process_ipc_info.ns->uri.len);
+    if (!new_process_ipc_info->ns)
+        goto fail;
 
     unlock(&g_process_ipc_info.lock);
     return new_process_ipc_info;
@@ -362,6 +364,7 @@ int get_ipc_info_cur_process(struct shim_ipc_info** info) {
     lock(&g_process_ipc_info.lock);
 
     if (!g_process_ipc_info.self) {
+        // TODO assert
         BUG();
     }
 

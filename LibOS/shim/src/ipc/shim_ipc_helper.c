@@ -107,15 +107,32 @@ static int init_parent_ipc_port(void) {
 
 static int init_ns_ipc_port(void) {
     if (!g_process_ipc_info.ns) {
-        /* no NS info from parent process, no sense in creating NS IPC port */
+        if (g_process_ipc_info.parent) {
+            // TODO assert
+            BUG();
+        }
+        if (PAL_CB(parent_process)) {
+            // TODO assert
+            BUG();
+        }
+        /* We are the very first Graphene process, hence also IPC leader. */
+        lock(&g_process_ipc_info.lock);
+        assert(g_process_ipc_info.self);
+        get_ipc_info(g_process_ipc_info.self);
+        g_process_ipc_info.ns = g_process_ipc_info.self;
+        unlock(&g_process_ipc_info.lock);
         return 0;
     }
 
     if (g_process_ipc_info.ns->port) {
+        // TODO assert
+        BUG();
         return 0;
     }
 
     if (qstrempty(&g_process_ipc_info.ns->uri)) {
+        // TODO assert
+        BUG();
         /* there is no connection to NS leader via PAL handle and there is no URI to find NS leader:
          * do not create NS IPC port now, it will be created on-demand during NS leader lookup */
         return 0;
