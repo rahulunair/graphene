@@ -134,7 +134,6 @@ int add_ipc_subrange(IDTYPE idx, IDTYPE owner, const char* uri);
 IDTYPE allocate_ipc_id(IDTYPE min, IDTYPE max);
 void release_ipc_id(IDTYPE idx);
 
-int connect_ns(IDTYPE* vmid, struct shim_ipc_port** portptr);
 int connect_owner(IDTYPE idx, struct shim_ipc_port** portptr, IDTYPE* owner);
 
 /* sysv namespace */
